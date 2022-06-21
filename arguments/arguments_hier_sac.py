@@ -35,7 +35,7 @@ def get_args_ant():
     parser.add_argument('--n-test-rollouts', type=int, default=10, help='the number of tests')
 
     parser.add_argument('--metric', type=str, default='MLP', help='the metric for the distance embedding')
-    parser.add_argument('--device', type=str, default="cuda:3", help='cuda device')
+    parser.add_argument('--device', type=str, default="cuda", help='cuda device')
 
     parser.add_argument('--lr-decay-actor', type=int, default=3000, help='actor learning rate decay')
     parser.add_argument('--lr-decay-critic', type=int, default=3000, help='critic learning rate decay')
@@ -118,7 +118,7 @@ def get_args_chain():
     parser.add_argument('--n-test-rollouts', type=int, default=10, help='the number of tests')
 
     parser.add_argument('--metric', type=str, default='MLP', help='the metric for the distance embedding')
-    parser.add_argument('--device', type=str, default="cuda:8", help='cuda device')
+    parser.add_argument('--device', type=str, default="cuda", help='cuda device')
 
     parser.add_argument('--lr-decay-actor', type=int, default=3000, help='actor learning rate decay')
     parser.add_argument('--lr-decay-critic', type=int, default=3000, help='critic learning rate decay')

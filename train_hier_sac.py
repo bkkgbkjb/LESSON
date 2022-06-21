@@ -2,6 +2,7 @@ import numpy as np
 import gym
 from arguments.arguments_hier_sac import get_args_ant, get_args_chain
 from algos.hier_sac import hier_sac_agent
+from env_utils import RecordVideo
 from goal_env.mujoco import *
 import random
 import torch
@@ -20,6 +21,7 @@ def launch(args):
     # create the ddpg_agent
     env = gym.make(args.env_name)
     test_env = gym.make(args.test)
+    test_env = RecordVideo(test_env, "vlog/LESSON", episode_trigger= lambda episode_id: episode_id % 5 == 0)
     # if args.env_name == "AntPush-v1":
     #     test_env1 = gym.make("AntPushTest1-v1")
     #     test_env2 = gym.make("AntPushTest2-v1")
@@ -40,7 +42,7 @@ def launch(args):
     torch.manual_seed(args.seed)
     if args.device is not 'cpu':
         torch.cuda.manual_seed(args.seed)
-    gym.spaces.prng.seed(args.seed)
+    # gym.spaces.prng.seed(args.seed)
     # get the environment parameters
     if args.env_name[:3] in ["Ant", "Poi", "Swi"]:
         env.env.env.visualize_goal = args.animate

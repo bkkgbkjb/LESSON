@@ -92,6 +92,12 @@ class SAC(object):
         qf1_loss = F.mse_loss(qf1, next_q_value)  # JQ = 𝔼(st,at)~D[0.5(Q1(st,at) - r(st,at) - γ(𝔼st+1~p[V(st+1)]))^2]
         qf2_loss = F.mse_loss(qf2, next_q_value)  # JQ = 𝔼(st,at)~D[0.5(Q1(st,at) - r(st,at) - γ(𝔼st+1~p[V(st+1)]))^2]
 
+        qf_loss = qf1_loss + qf2_loss
+
+        self.critic_optim.zero_grad()
+        qf_loss.backward()
+        self.critic_optim.step()
+
         pi, log_pi, _ = self.policy.sample(state_batch)
 
         qf1_pi, qf2_pi = self.critic(state_batch, pi)
@@ -107,6 +113,7 @@ class SAC(object):
                 representation_loss = (min_dist + max_dist).mean()
                 qf1_loss = qf1_loss * 0.1 + representation_loss
             else:
+                assert False
                 obs, obs_next = self.policy.phi(feature_data[0]), self.policy.phi(feature_data[1])
                 min_dist = torch.clamp((obs - obs_next).pow(2).mean(dim=1), min=0.)
                 hi_obs, hi_obs_next = self.policy.phi(feature_data[2]), self.policy.phi(feature_data[3])
@@ -115,13 +122,13 @@ class SAC(object):
                 policy_loss += representation_loss
 
 
-        self.critic_optim.zero_grad()
-        qf1_loss.backward()
-        self.critic_optim.step()
+        # self.critic_optim.zero_grad()
+        # qf1_loss.backward()
+        # self.critic_optim.step()
 
-        self.critic_optim.zero_grad()
-        qf2_loss.backward()
-        self.critic_optim.step()
+        # self.critic_optim.zero_grad()
+        # qf2_loss.backward()
+        # self.critic_optim.step()
 
         self.policy_optim.zero_grad()
         policy_loss.backward()
