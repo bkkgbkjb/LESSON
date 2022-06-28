@@ -4,6 +4,7 @@ from arguments.arguments_hier_sac import get_args_ant, get_args_chain
 from algos.hier_sac import hier_sac_agent
 from env_utils import RecordVideo
 from goal_env.mujoco import *
+from datetime import datetime
 import random
 import torch
 
@@ -48,7 +49,7 @@ def launch(args):
         test_env.env.env.visualize_goal = args.animate
     env_params = get_env_params(env)
     env_params['max_test_timesteps'] = test_env._max_episode_steps
-    test_env = RecordVideo(test_env, "vlog/LESSON", episode_trigger= lambda episode_id: episode_id % 5 == 0)
+    test_env = RecordVideo(test_env, "vlog/LESSON" + '_' + datetime.now().strftime("%m-%d_%H-%M"), episode_trigger= lambda episode_id: episode_id % 5 == 0)
     # create the ddpg agent to interact with the environment
     sac_trainer = hier_sac_agent(args, env, env_params, test_env, test_env1, test_env2)
     if args.eval:
