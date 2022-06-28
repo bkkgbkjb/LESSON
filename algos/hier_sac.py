@@ -394,10 +394,10 @@ class hier_sac_agent:
                     self.visualize_representation(epoch=epoch)
                 if self.args.save:
                     print("log_dir: ", self.log_dir)
-                    torch.save([self.hi_agent.critic.state_dict()], self.model_path + '/hi_critic_model.pt')
-                    torch.save([self.low_critic_network.state_dict()], self.model_path + '/low_critic_model.pt')
-                    torch.save(self.hi_buffer, self.model_path + '/hi_buffer.pt')
-                    torch.save(self.low_buffer, self.model_path + '/low_buffer.pt')
+                    torch.save([self.hi_agent.critic.state_dict()], self.model_path + f'/hi_critic_model_{epoch}.pt')
+                    torch.save([self.low_critic_network.state_dict()], self.model_path + f'/low_critic_model_{epoch}.pt')
+                    # torch.save(self.hi_buffer, self.model_path + '/hi_buffer.pt')
+                    # torch.save(self.low_buffer, self.model_path + '/low_buffer.pt')
                     if not self.args.gradient_flow and not self.args.gradient_flow_value:
                         if self.save_model:
                             # self.cal_MIV(epoch)
@@ -405,9 +405,9 @@ class hier_sac_agent:
                             torch.save([self.hi_agent.policy.state_dict()], self.model_path + '/hi_actor_{}.pt'.format(epoch))
                             torch.save([self.low_actor_network.state_dict()], self.model_path + '/low_actor_{}.pt'.format(epoch))
                         else:
-                            torch.save([self.representation.state_dict()], self.model_path + '/phi_model.pt')
-                            torch.save([self.hi_agent.policy.state_dict()], self.model_path + '/hi_actor_model.pt')
-                            torch.save([self.low_actor_network.state_dict()], self.model_path + '/low_actor_model.pt')
+                            torch.save([self.representation.state_dict()], self.model_path + f'/phi_model_{epoch}.pt')
+                            torch.save([self.hi_agent.policy.state_dict()], self.model_path + f'/hi_actor_model_{epoch}.pt')
+                            torch.save([self.low_actor_network.state_dict()], self.model_path + f'/low_actor_model_{epoch}.pt')
                     self.writer.add_scalar('Success_rate/hier_farthest_' + self.args.env_name, farthest_success_rate, epoch)
                     self.writer.add_scalar('Success_rate/hier_random_' + self.args.env_name, random_success_rate, epoch)
                     self.writer.add_scalar('Explore/furthest_task_' + self.args.env_name, self.furthest_task, epoch)
