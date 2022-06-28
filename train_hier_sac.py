@@ -21,7 +21,6 @@ def launch(args):
     # create the ddpg_agent
     env = gym.make(args.env_name)
     test_env = gym.make(args.test)
-    test_env = RecordVideo(test_env, "vlog/LESSON", episode_trigger= lambda episode_id: episode_id % 5 == 0)
     # if args.env_name == "AntPush-v1":
     #     test_env1 = gym.make("AntPushTest1-v1")
     #     test_env2 = gym.make("AntPushTest2-v1")
@@ -49,6 +48,7 @@ def launch(args):
         test_env.env.env.visualize_goal = args.animate
     env_params = get_env_params(env)
     env_params['max_test_timesteps'] = test_env._max_episode_steps
+    test_env = RecordVideo(test_env, "vlog/LESSON", episode_trigger= lambda episode_id: episode_id % 5 == 0)
     # create the ddpg agent to interact with the environment
     sac_trainer = hier_sac_agent(args, env, env_params, test_env, test_env1, test_env2)
     if args.eval:
