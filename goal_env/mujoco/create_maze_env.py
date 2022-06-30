@@ -142,6 +142,10 @@ class GoalWrapper(Wrapper):
             out['observation'] = out['observation'] * mask
         return out
 
+    def seed(self, seed=None):
+        self.env.seed(seed)
+        self.goal_space.seed(seed)
+        self.env.wrapped_env.seed(seed)
 
 def create_maze_env(env_name=None, top_down_view=False, maze_size_scaling=4, random_start=True, goal_args=None,
                     fix_goal=True, test=None):

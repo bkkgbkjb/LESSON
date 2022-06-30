@@ -52,6 +52,17 @@ def launch(args):
     test_env = RecordVideo(test_env, "vlog/LESSON" + '_' + datetime.now().strftime("%m-%d_%H-%M"), episode_trigger= lambda episode_id: episode_id % 5 == 0)
     # create the ddpg agent to interact with the environment
     sac_trainer = hier_sac_agent(args, env, env_params, test_env, test_env1, test_env2)
+    if args.collect_samples:
+        models = {
+            "high_actor": torch.load("./high-actor-12500.pt")[0],
+            "high_critic": torch.load('./high-critic-12500.pt')[0],
+            "low_actor": torch.load('./low-actor-12500.pt')[0],
+            "low_critic": torch.load('./low-critic-12500.pt')[0],
+            "phi": torch.load('./phi-12500.pt')[0]
+        }
+        sac_trainer.load_params(models)
+        sac_trainer.collect_samples(env, "AntMaze")
+        return
     if args.eval:
         if not args.resume:
             print("random policy !!!")

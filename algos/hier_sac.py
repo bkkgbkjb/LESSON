@@ -1,6 +1,7 @@
 import os
 import sys
 
+from tqdm import tqdm
 sys.path.append('../')
 from datetime import datetime
 from tensorboardX import SummaryWriter
@@ -416,6 +417,83 @@ class hier_sac_agent:
                                                eval_success1, epoch)
                         self.writer.add_scalar('Success_rate/eval2_' + self.args.env_name, eval_success2,
                                                epoch)
+
+    def load_params(self, models_dict):
+        self.low_actor_network.load_state_dict(models_dict['low_actor'])
+        self.low_critic_network.load_state_dict(models_dict['low_critic'])
+        self.representation.load_state_dict(models_dict['phi'])
+        self.hi_agent.policy.load_state_dict(models_dict['high_actor'])
+        self.hi_agent.critic.load_state_dict(models_dict['high_critic'])
+    
+    def collect_samples(self, env, name, total_frames = int(3e6)):
+        import h5py
+        frames = 0
+
+        collected = {
+            'state': [],
+            'action': [],
+            'reward': [],
+            'done': [],
+            'next_state': [],
+            'info/goal': [],
+            'info/pos': [],
+            'info/is_success': []
+        }
+        success_times = 0
+        fail_times = 0
+        env.seed(0)
+
+        with tqdm(total=total_frames) as pbar:
+            while frames <= total_frames:
+                observation = env.reset()
+                obs = observation['observation']
+                g = observation['desired_goal']
+
+                for num in range(self.env_params['max_test_timesteps']):
+                    with torch.no_grad():
+                        act_obs, act_g = self._preproc_inputs(obs, g)
+                        if num % self.c == 0:
+                            hi_act_obs = np.concatenate((obs[:self.hi_dim], g))
+                            hi_action = self.hi_agent.select_action(hi_act_obs, evaluate=True)
+
+                            ag = self.representation(torch.Tensor(obs).to(self.device)).detach().cpu().numpy()[0]
+                            new_hi_action = ag + hi_action
+                            new_hi_action = np.clip(new_hi_action, -SUBGOAL_RANGE, SUBGOAL_RANGE)
+
+                            hi_action_tensor = torch.tensor(new_hi_action, dtype=torch.float32).unsqueeze(0).to(self.device)
+                        action = self.test_policy(act_obs[:, :self.low_dim], hi_action_tensor)
+
+                    collected['state'].append(obs)
+                    collected['action'].append(action)
+                    collected['info/goal'].append(g)
+                    collected['info/pos'].append(obs[:3])
+
+                    observation_new, rew, done, info = env.step(action)
+
+                    frames += 1
+                    pbar.update(1)
+
+                    collected['info/is_success'].append(info['is_success'])
+
+                    collected['reward'].append(rew)
+                    collected['done'].append(done)
+                    collected['next_state'].append(observation_new['observation'])
+
+                    obs = observation_new['observation']
+                    g = observation_new['desired_goal']
+
+                    if done:
+                        if info['is_success']:
+                            success_times += 1
+                        else:
+                            fail_times += 1
+                        break
+        
+        with h5py.File(f'./{name}.hdf5', 'w') as f:
+            for (k, v) in collected.items():
+                f.create_dataset(k, data = np.asarray(v))
+        
+        print(f'collect sample finished: success_rate is: {success_times / (success_times + fail_times)}, success_times: {success_times}, fail_times: {fail_times}, total_episode: {success_times + fail_times}')
 
     # pre_process the inputs
     def _preproc_inputs(self, obs, g):
