@@ -54,14 +54,14 @@ def launch(args):
     sac_trainer = hier_sac_agent(args, env, env_params, test_env, test_env1, test_env2)
     if args.collect_samples:
         models = {
-            "high_actor": torch.load("./high-actor-16250.pt")[0],
-            "high_critic": torch.load('./high-critic-16250.pt')[0],
-            "low_actor": torch.load('./low-actor-16250.pt')[0],
-            "low_critic": torch.load('./low-critic-16250.pt')[0],
-            "phi": torch.load('./phi-16250.pt')[0]
+            "high_actor": torch.load("./high-actor-3900.pt")[0],
+            "high_critic": torch.load('./high-critic-3900.pt')[0],
+            "low_actor": torch.load('./low-actor-3900.pt')[0],
+            "low_critic": torch.load('./low-critic-3900.pt')[0],
+            "phi": torch.load('./phi-3900.pt')[0]
         }
         sac_trainer.load_params(models)
-        sac_trainer.collect_samples(env, "AntPush")
+        sac_trainer.collect_samples(env, "AntFall")
         return
     if args.eval:
         if not args.resume:
