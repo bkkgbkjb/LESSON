@@ -61,7 +61,7 @@ def launch(args):
             "phi": torch.load('./phi-16250.pt')[0]
         }
         sac_trainer.load_params(models)
-        sac_trainer.collect_samples(env, "AntMaze")
+        sac_trainer.collect_samples(env, "AntPush")
         return
     if args.eval:
         if not args.resume:
