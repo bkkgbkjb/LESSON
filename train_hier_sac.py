@@ -54,11 +54,11 @@ def launch(args):
     sac_trainer = hier_sac_agent(args, env, env_params, test_env, test_env1, test_env2)
     if args.collect_samples:
         models = {
-            "high_actor": torch.load("./high-actor-12500.pt")[0],
-            "high_critic": torch.load('./high-critic-12500.pt')[0],
-            "low_actor": torch.load('./low-actor-12500.pt')[0],
-            "low_critic": torch.load('./low-critic-12500.pt')[0],
-            "phi": torch.load('./phi-12500.pt')[0]
+            "high_actor": torch.load("./high-actor-16250.pt")[0],
+            "high_critic": torch.load('./high-critic-16250.pt')[0],
+            "low_actor": torch.load('./low-actor-16250.pt')[0],
+            "low_critic": torch.load('./low-critic-16250.pt')[0],
+            "phi": torch.load('./phi-16250.pt')[0]
         }
         sac_trainer.load_params(models)
         sac_trainer.collect_samples(env, "AntMaze")
